@@ -70,7 +70,7 @@ void List::bubbleSort()
 		leastElementIndex = iteration;
 		for (int i = iteration; i < this->size; i++)
 		{
-			if (this->list[i + 1] < this->list[leastElementIndex])
+			if (this->list[i+1] < this->list[leastElementIndex])
 			{
 				leastElementIndex = i + 1;
 			}
@@ -78,6 +78,9 @@ void List::bubbleSort()
 		}
 		swap(this->list[leastElementIndex], this->list[iteration]);
 		swaps++;
+		int progress = ceil(iteration * 100 / this->size)+1;
+		int nextProgress = ceil((iteration + 1) * 100 / this->size)+1;
+		if (progress < nextProgress) cout << "Progress :" << progress << "%" << endl;
 	}
 }
 
@@ -93,7 +96,7 @@ void List::selectionSort()
 		leastElementIndex = iteration;
 		for (int i = iteration; i < this->size; i++)
 		{
-			if (this->list[i + 1] < this->list[leastElementIndex])
+			if (this->list[i+1] < this->list[leastElementIndex])
 			{
 				leastElementIndex = i + 1;
 			}
@@ -101,7 +104,8 @@ void List::selectionSort()
 		}
 		swap(this->list[leastElementIndex], this->list[iteration]);
 		swaps++;
-		int progress = round(iteration * 100 / this->size);
-		cout << "Progress :" << progress << "%" << endl;
+		int progress = ceil(iteration * 100 / this->size)+1;
+		int nextProgress = ceil((iteration+1) * 100 / this->size)+1;
+		if (progress < nextProgress) cout << "Progress :" << progress << "%" << endl;
 	}
 }
