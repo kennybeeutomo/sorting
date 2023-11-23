@@ -1,6 +1,6 @@
 #include <iostream>
-#include <conio.h>
-//#include <curses.h>
+//#include <conio.h>
+#include <curses.h>
 #include "List.h"
 
 using namespace std;
@@ -8,6 +8,8 @@ using namespace std;
 int main()
 {
 	srand(time(0));
+
+	//initscr();
 
 	List l1("List1",
 		2, 4, 5, 3, 1, 3, 1, 6, 8, 2, 0, 1
@@ -20,11 +22,14 @@ int main()
 	l1.randomize(rSize);
 	//l1.printList();
 	cout << "randomized" << endl << endl;
-	_getch();
+	getch();
 	cout << "sorting..." << endl;
-	l1.selectionSort();
+	l1.bubbleSort();
 	//l1.printList();
 	cout << "sorted" << endl;
 
+	//refresh();
+	getch();
+	//endwin();
 	return 0;
 }
