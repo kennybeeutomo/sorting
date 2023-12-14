@@ -1,23 +1,40 @@
 #pragma once
+#include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 #include <string>
 #include <stdarg.h>
-using namespace std;
+
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+using std::swap;
 
 class List
 {
 	public:
-		List(string name, int a, ...);
+		List(string _name, int a, ...);
 		void printList();
-		void shuffle(int times = 1);
-		void randomize(int randomizeSize = -1);
 
-		void bubbleSort();
-		void selectionSort();
+		int& operator[](int _index);
+		int& at(int _index);
+		List& operator<<(int _number);
+		void operator=(vector <int> _list);
+		
+		vector <int> extract();
+		int size();
+		int max();
+		int min();
+
+		void shuffle(int _times = 1);
+		void randomize(int _randomizeSize = -1); //-1 = don't change list size
+		void randomizeRange(int _min, int _max, int _randomizeSize = -1);
 
 	private:
 		string name = "Unnamed List";
 		vector <int> list;
-		int size;
-
+		void initRandom(int& _randomizeSize);
 };

@@ -1,35 +1,32 @@
 #include <iostream>
-//#include <conio.h>
+#include <conio.h>
 #include <curses.h>
 #include "List.h"
-
-using namespace std;
+#include "Visualizer.h"
 
 int main()
 {
+	initscr();
+	noecho();
 	srand(time(0));
 
-	//initscr();
-
 	List l1("List1",
-		2, 4, 5, 3, 1, 3, 1, 6, 8, 2, 0, 1
+		2,20,11,14,1,7,9,17
 		, -1);
 
-	int rSize;
-	cin >> rSize;
+	Visualizer v1(&l1);
+	v1.barWidth = 5;
+	l1.randomizeRange(1, 31, 23);
+	v1.display();
 
-	cout << "randomizing..." << endl;
-	l1.randomize(rSize);
-	//l1.printList();
-	cout << "randomized" << endl << endl;
-	getch();
-	cout << "sorting..." << endl;
-	l1.bubbleSort();
-	//l1.printList();
-	cout << "sorted" << endl;
+	while (getch()!='c')
+	{
+		clear();
+		l1.shuffle();
+		v1.display();
+	}
 
-	//refresh();
-	getch();
-	//endwin();
+	refresh();
+	endwin();
 	return 0;
 }
