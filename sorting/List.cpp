@@ -3,6 +3,7 @@
 List::List(string _name, int a, ...)
 {
 	name = _name;
+
 	int b = a;
 	va_list value;
 	va_start(value, a);
@@ -15,8 +16,11 @@ List::List(string _name, int a, ...)
 
 	va_end(value);
 }
-
-void List::printList()
+List::List(string _name)
+{
+	name = _name;
+}
+void List::printList() const
 {
 	cout << name << " (" << size() << ") " << ": (";
 	for (int i = 0 ; i < size() ; i++)
@@ -31,18 +35,15 @@ int& List::operator[](int _index)
 {
 	return list.at(_index);
 }
-
 int& List::at(int _index)
 {
 	return list.at(_index);
 }
-
 List& List::operator<<(int _number)
 {
 	list.push_back(_number);
 	return *this;
 }
-
 void List::operator=(vector<int> _list)
 {
 	list = _list;
@@ -52,37 +53,44 @@ vector<int> List::extract()
 {
 	return list;
 }
-
-int List::size()
+int List::size() const
 {
 	return list.size();
 }
-
-int List::max()
+int List::max() const
 {
 	int maxInt = list[0];
-	for (int& i : list)
+	for (const int& i : list)
 		if (i > maxInt) maxInt = i;
 	return maxInt;
 }
-
-int List::min()
+int List::min() const
 {
 	int minInt = list[0];
-	for (int& i : list)
+	for (const int& i : list)
 		if (i < minInt) minInt = i;
 	return minInt;
 }
-
-void List::shuffle(int _times)
+string List::getName() const
 {
-	for (int i = 0; i < _times; i++)
-	{
-		for (int j = 0; j < size(); j++)
-		{
-			swap(list.at(j), list.at(rand() % (size() - 1)));
-		}
-	}
+	return name;
+}
+
+void List::orderedList(int _size)
+{
+	if (_size > 30) _size = 30;
+	list.clear();
+	list.reserve(_size);
+	for (int i = 0; i < _size; i++)
+		list.push_back(i+1);
+}
+void List::reversedList(int _size)
+{
+	if (_size > 30) _size = 30;
+	list.clear();
+	list.reserve(_size);
+	for (int i = 0; i < _size; i++)
+		list.push_back(_size-i);
 }
 
 void List::randomize(int _randomizeSize)
@@ -94,7 +102,6 @@ void List::randomize(int _randomizeSize)
 		list.push_back(randomInt);
 	}
 }
-
 void List::randomizeRange(int _min, int _max, int _randomizeSize)
 {
 	initRandom(_randomizeSize);
@@ -105,6 +112,7 @@ void List::randomizeRange(int _min, int _max, int _randomizeSize)
 	}
 }
 
+//private
 void List::initRandom(int& _randomizeSize)
 {
 	if (_randomizeSize < -1) return;

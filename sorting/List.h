@@ -17,7 +17,8 @@ class List
 {
 	public:
 		List(string _name, int a, ...);
-		void printList();
+		List(string _name);
+		void printList() const;
 
 		int& operator[](int _index);
 		int& at(int _index);
@@ -25,11 +26,13 @@ class List
 		void operator=(vector <int> _list);
 		
 		vector <int> extract();
-		int size();
-		int max();
-		int min();
+		int size() const;
+		int max() const;
+		int min() const;
+		string getName() const;
 
-		void shuffle(int _times = 1);
+		void orderedList(int _size);
+		void reversedList(int _size);
 		void randomize(int _randomizeSize = -1); //-1 = don't change list size
 		void randomizeRange(int _min, int _max, int _randomizeSize = -1);
 

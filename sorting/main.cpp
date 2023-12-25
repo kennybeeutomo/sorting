@@ -1,29 +1,28 @@
 #include <iostream>
 #include <conio.h>
 #include <curses.h>
-#include "List.h"
-#include "Visualizer.h"
+#include "Sorter.h"
 
 int main()
 {
 	initscr();
 	noecho();
-	srand(time(0));
+	srand(static_cast<unsigned>(time(0)));
 
-	List l1("List1",
-		2,20,11,14,1,7,9,17
-		, -1);
+	List l1("List1");
+	l1.randomizeRange(1, 30, 20);
 
 	Visualizer v1(&l1);
-	v1.barWidth = 5;
-	l1.randomizeRange(1, 31, 23);
-	v1.display();
+	Sorter s1(&l1, &v1);
+	s1.pauseMode = true;
+	s1.delay = 0;
 
-	while (getch()!='c')
+	while (true)
 	{
-		clear();
-		l1.shuffle();
-		v1.display();
+		s1.bubbleSort();
+		s1.shuffle();
+		s1.selectionSort();
+		s1.shuffle();
 	}
 
 	refresh();
