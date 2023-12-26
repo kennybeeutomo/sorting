@@ -67,13 +67,11 @@ void Sorter::bubbleSort(bool _extraVisualization)
 
 			display();
 
-			if (*selection(1).selectedInt > *selection(2).selectedInt)
+			if (selection(1) > selection(2))
 			{
 				swapSelections(selection(1), selection(2));
-				swaps++;
 				if (_extraVisualization) display();
 			}
-			comparisons++;
 
 			removeSelectionById(1);
 			removeSelectionById(2);
@@ -92,26 +90,57 @@ void Sorter::selectionSort(bool _extraVisualization)
 	{
 		makeSelection(iterations - 1, YELLOW, 0);
 		makeSelection(iterations - 1, GREEN, 1);
+
 		for (int i = 0; i < list->size() - iterations; i++)
 		{
 			makeSelection(i + iterations, RED, 2);
 
 			display();
-			if (*selection(1).selectedInt > *selection(2).selectedInt)
+			if (selection(1) > selection(2))
 			{
 				selection(1).selectInt(i + iterations);
 			}
-			comparisons++;
 
 			removeSelectionById(2);
 		}
 		if (_extraVisualization) display();
 		swapSelections(selection(0), selection(1));
 		if (_extraVisualization) display();
-		swaps++;
 		makeSelection(iterations - 1, BLUE, 3);
+
 		removeSelectionById(0);
 		removeSelectionById(1);
+	}
+
+	endSort();
+}
+void Sorter::insertionSort(bool _extraVisualization)
+{
+	startSort("insertion sort");
+
+	for (int iterations = 0; iterations < list->size() - 1; iterations++)
+	{
+		makeSelection(iterations, GREEN, 1);
+		makeSelection(iterations + 1, RED, 2);
+
+		display();
+
+		for (int i = iterations; selection(1) > selection(2);)
+		{
+			swapSelections(selection(1), selection(2));
+			if (_extraVisualization) display();
+			if (i != 0)
+			{
+				selection(1).selectInt(selection(1).selectedIndex - 1);
+				selection(2).selectInt(selection(2).selectedIndex - 1);
+				i--;
+				display();
+			}
+		}
+
+		removeSelectionById(1);
+		removeSelectionById(2);
+		makeSelection(iterations, BLUE, 3);
 	}
 
 	endSort();
@@ -125,32 +154,38 @@ bool Sorter::checkSort()
 
 	for (int i = 0; i < list->size() - 1; i++)
 	{
-		Selection selection1 = makeSelection(i, GREEN);
-		Selection selection2 = makeSelection(i + 1, WHITE);
+		makeSelection(i, GREEN, 1);
+		makeSelection(i + 1, GREEN, 2);
 
 		display();
-		if (*selection1.selectedInt > *selection2.selectedInt)
+		if (*selection(1).selectedInt > *selection(2).selectedInt)
 		{
 			status = "list not sorted properly";
-			selections.pop_back();
-			selections.pop_back();
+
+			removeSelectionById(1);
+			removeSelectionById(2);
+			
 			makeSelection(i, RED);
 			makeSelection(i + 1, RED);
+			
 			isSorted = false;
 			displayWithForcedPause();
 			break;
 		}
 
-		selections.pop_back();
+		removeSelectionById(1);
+		removeSelectionById(2);
+		makeSelection(i, GREEN, 3);
 	}
 
 	if (isSorted)
 	{
+		makeSelection(list->size() - 1, GREEN, 3);
 		status = "list properly sorted";
 		displayWithForcedPause();
 	}
+	clearSelections();
 	status = "idle";
-	selections.clear();
 	return isSorted;
 }
 bool Sorter::pause()
@@ -194,6 +229,42 @@ void Sorter::Selection::selectRandomInt()
 	selectInt( rand()%list->size() );
 }
 
+int Sorter::Selection::getInt()
+{
+	return *selectedInt;
+}
+
+bool Sorter::Selection::operator<(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() < _selection.getInt();
+}
+bool Sorter::Selection::operator>(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() > _selection.getInt();
+}
+bool Sorter::Selection::operator==(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() == _selection.getInt();
+}
+bool Sorter::Selection::operator<=(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() <= _selection.getInt();
+}
+bool Sorter::Selection::operator>=(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() >= _selection.getInt();
+}
+bool Sorter::Selection::operator!=(Selection& _selection)
+{
+	(*comparisons)++;
+	return getInt() != _selection.getInt();
+}
+
 int Sorter::Selection::getIndex()
 {
 	for (int i = 0; i < selections->size(); i++)
@@ -226,46 +297,68 @@ Sorter::Selection& Sorter::makeSelection(int _index, int _color, int _id)
 {
 	Selection newSelection(list, &selections, _index, _color);
 	if (_id != -1) newSelection.id = _id;
+	newSelection.comparisons = &comparisons;
 	selections.push_back(newSelection);
 	return selections.back();
 }
-void Sorter::removeSelectionById(int _id)
+void Sorter::eraseByIndex(int _index)
 {
-	int index = 0;
-	for (auto& selection : selections)
-	{
-		if (selection.id == _id)
-			break;
-		index++;
-	}
-
-	vector<Selection>::iterator selectionIterator = selections.begin() + index;
+	vector<Selection>::iterator selectionIterator = selections.begin() + _index;
 	selections.erase(selectionIterator);
 }
-void Sorter::removeSelectionByColor(int _color, bool removeAll)
+bool Sorter::removeSelectionById(int _id)
 {
-	for (auto& selection : selections)
-		if (selection.selectionColor == _color)
+	size_t i = selections.size();
+	for (; i-- > 0;)
+		if (selections.at(i).id == _id)
 		{
-			removeSelectionById(selection.id);
-			if (!removeAll) break;
+			eraseByIndex(i);
+			return true;
 		}
+	return false;
+}
+bool Sorter::removeSelectionByColor(int _color)
+{
+	size_t i = selections.size();
+	for (; i-- > 0;)
+		if (selections.at(i).selectionColor == _color)
+		{
+			eraseByIndex(i);
+			return true;
+		}
+	return false;
+}
+bool Sorter::removeAllSelectionById(int _id)
+{
+	bool success = false;
+	while (removeSelectionById(_id)) success = true;
+	return success;
+}
+bool Sorter::removeAllSelectionByColor(int _color)
+{
+	bool success = false;
+	while (removeSelectionByColor(_color)) success = true;
+	return success;
 }
 Sorter::Selection& Sorter::selection(int _id)
 {
 	for (auto& selection : selections)
 		if (selection.id == _id)
 			return selection;
+	return *selections.end();
 }
-void Sorter::removeRecentSelection()
+void Sorter::removeRecentSelection(int _times)
 {
-	selections.pop_back();
+	for (;_times!=0;_times--)
+		selections.pop_back();
 }
 void Sorter::swapSelections(Selection& _left, Selection& _right)
 {
 	swap(*_left.selectedInt, *_right.selectedInt);
+	swaps++;
 }
 void Sorter::swapSelections(Selection* _left, Selection* _right)
 {
 	swap(*_left->selectedInt, *_right->selectedInt);
+	swaps++;
 }
